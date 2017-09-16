@@ -19,6 +19,7 @@ namespace GameOfLife
                 Console.WriteLine("Generation: {0}", generation);
                 Thread.Sleep(1000);
                 Console.Clear();
+                
             }
         }
 
@@ -55,7 +56,23 @@ namespace GameOfLife
         public Life()
         {
             current = new State[length, width];
+            for (int i = 0; i < current.GetLength(0); i++)
+            {
+                for (int j = 0; j < current.GetLength(1); j++)
+                {
+                    current[i, j] = State.Dead;
+                }
+            }
+
             next = new State[length, width];
+
+            for (int i = 0; i < next.GetLength(0); i++)
+            {
+                for (int j = 0; j < next.GetLength(1); j++)
+                {
+                    next[i, j] = State.Dead;
+                }
+            }
         }
 
             
