@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace GameOfLife
 {
@@ -6,7 +7,33 @@ namespace GameOfLife
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var game = new Life();
+
+            int generation = 0;
+
+            while (generation < 100)
+            {
+                game.CalculateNextGeneration();
+                generation++;
+                PrintGeneration(game.current);
+                Console.WriteLine("Generation: {0}", generation);
+                Thread.Sleep(1000);
+                Console.Clear();
+            }
+        }
+
+        static void PrintGeneration(State[,] state)
+        {
+            for (int i = 0; i < state.GetLength(0); i++)
+            {
+                for (int j = 0; j < state.GetLength(1); j++)
+                {
+                    char toWrite = state[i, j] == State.Alive ? '#' : ' ';
+                    Console.Write(toWrite);
+                }
+
+                Console.WriteLine();
+            }
         }
     }
 
@@ -19,11 +46,10 @@ namespace GameOfLife
 
     class Life
     {
-        private const int length = 72;
-        private const int width = 36;
-        private readonly int generations;
+        private const int length = 36;
+        private const int width = 72;
 
-        private State[,] current;
+        public State[,] current { get; set; }
         private State[,] next;
 
         public Life()
@@ -32,9 +58,8 @@ namespace GameOfLife
             next = new State[length, width];
         }
 
-        private void NextGeneartion() => current = next.Clone() as State[,];
             
-        private void CalculateNextGeneration()
+        public void CalculateNextGeneration()
         {
             for (int i = 1; i < length - 1; i++)
             {
@@ -42,13 +67,16 @@ namespace GameOfLife
                 {
                     var neighboursCount = GetNeighboursAliveCount(i, j);
                     if (current[i, j] == State.Alive)
-                        HandleAliveCell(neighboursCount);
+                        next[i,j] = HandleAliveCell(neighboursCount);
                     else
-                        HandleDeadCell(neighboursCount);
+                        next[i,j] = HandleDeadCell(neighboursCount);
                 }
             }
+
+            NextGeneartion();
         }
 
+        private void NextGeneartion() => current = next.Clone() as State[,];
         private State HandleDeadCell(int aliveCount) => aliveCount == 3 ? State.Alive : State.Dead;
 
         private State HandleAliveCell(int aliveCount) => aliveCount == 2 || aliveCount == 3 ? State.Alive : State.Dead;
